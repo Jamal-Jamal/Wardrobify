@@ -1,6 +1,8 @@
 # Wardrobify
 
 Team:
+* Steven Duong - Hats
+* Jamal Degeratto - Shoes
 
 * Steven Duong - Hats
 * Jamal Degeratto - Shoes
@@ -18,11 +20,12 @@ docker-compose up
 ## Design
 
 
-
 ## Shoes microservice
 
 Explain your models and integration with the wardrobe
 microservice, here.
+
+
 
 ## Hats microservice
 
