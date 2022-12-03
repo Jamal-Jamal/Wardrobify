@@ -1,13 +1,13 @@
 from django.db import models
 from django.urls import reverse
 
-class Location(models.Model):
+class LocationVO(models.Model):
     closet_name = models.CharField(max_length=200)
     section_number = models.PositiveSmallIntegerField()
     shelf_number = models.PositiveSmallIntegerField()
 
     def get_api_url(self):
-        return reverse("api_location", kwargs={"pk": self.pk})
+        return reverse("api_show_location", kwargs={"pk": self.pk})
 
     def __str__(self):
         return f"(self.closet_name) - {self.section_number}/{self.shelf_number}"
@@ -23,8 +23,9 @@ class Hat(models.Model):
     picture_url = models.URLField(null=True)
 
     location = models.ForeignKey(
-        Location,
+        LocationVO,
         related_name="hats",
+        null=True,
         on_delete=models.CASCADE,
     )
 
