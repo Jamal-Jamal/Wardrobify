@@ -1,19 +1,16 @@
 from django.shortcuts import render
 from common.json import ModelEncoder
-from .models import Bin, Shoe
+from .models import BinVO, Shoe
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 import json
 
 
-class BinEncoder(ModelEncoder):
-    model = Bin
+class BinVOEncoder(ModelEncoder):
+    model = BinVO
     properties = [
         'closet_name',
-        'bin_size',
-        'bin_number',
-        'bin_href',
-        'id'
+        'import_href',
     ]
 
 
@@ -27,46 +24,94 @@ class ShoeEncoder(ModelEncoder):
         'id'
     ]
 
+
+class ShoeDetailEncoder(ModelEncoder):
+    model = Shoe
+    properties = [
+        "manufacturer",
+        "model_name",
+        "color",
+        "picture_url",
+        "bin",
+    ]
     encoders = {
-        'bin': BinEncoder
+        "bin": BinVOEncoder()
     }
 
 
-@require_http_methods(['GET', 'POST'])
-def api_list_shoe(request):
-    if request.method == 'GET':
-        shoes = Shoe.objects.all()
-        return JsonResponse({'shoes':shoes}, encoder=ShoeEncoder, safe=False)
+class ShoeListEncoder(ModelEncoder):
+    model = Shoe
+    properties = [
+        "manufacturer",
+        "model_name",
+        "color",
+        "picture_url",
+        "id",
+    ]
+    def get_extra_data(self, o):
+        return {"bin": o.bin.closet_name}
+
+    encoders = {
+        'bin': BinVOEncoder
+    }
+
+
+@require_http_methods({"GET", "POST"})
+def api_list_shoes(requests, bin_vo_id=None):
+    if requests.method == "GET":
+        if bin_vo_id is not None:
+            shoe = Shoe.objects.filter(bin=bin_vo_id)
+        else:
+            shoe = Shoe.objects.all()
+        return JsonResponse(
+            {"shoes": shoe},
+            encoder=ShoeListEncoder,
+        )
     else:
-        content = json.loads(request.body)
+        content = json.loads(requests.body)
         try:
+            bin_href = content["bin"]
+            bin = BinVO.objects.get(import_href=bin_href)
+            content["bin"] = bin
+        except BinVO.DoesNotExist:
+            return JsonResponse(
+                {"message": "Invalid bin id"},
+                status=400,
+            )
+        shoes = Shoe.objects.create(**content)
+        return JsonResponse(
+            shoes,
+            encoder=ShoeDetailEncoder,
+            safe=False,
+        )
 
-            bin_href = content['bin_href']
-            bin = Bin.objects.get(id = bin_href, safe=False)
-            content['bin_href'] = bin
 
-        except Bin.DoesNotExist:
-            return JsonResponse({'message': 'Bin does not exist'}, status=400)
-        shoe = Shoe.objects.create(**content)
-        return JsonResponse(shoe, encoder=ShoeEncoder, safe=False)
-
-
-@require_http_methods(['GET', 'PUT', 'DELETE'])
-def api_show_shoe(request, pk):
-    if request.method == 'DELETE':
+@require_http_methods({"GET", "DELETE", "PUT"})
+def api_show_shoe(requests, pk):
+    if requests.method == "GET":
+        try:
+            shoe = Shoe.objects.get(id=pk)
+            return JsonResponse(
+                shoe,
+                encoder=ShoeDetailEncoder,
+                safe=False,
+            )
+        except Shoe.DoesNotExist:
+            return JsonResponse(
+                {"message": "invalid shoe id"},
+                status=400,
+            )
+    elif requests.method == "DELETE":
         count, _ = Shoe.objects.filter(id=pk).delete()
-        return JsonResponse({'deleted': count > 0})
-    elif request.method == 'GET':
-        shoe = Shoe.objects.get(id=pk)
-        return JsonResponse(shoe, encoder=ShoeEncoder, safe=False)
+        return JsonResponse(
+            {"GoodBye!": count > 0}
+        )
     else:
-        content = json.loads(request.body)
-        try:
-            if 'bin' in content:
-                content['bin'] = Bin.objects.get(bin_number=content['bin'])
-        except Bin.DoesNotExist:
-            return JsonResponse({'message':'Invalid'}, status=400)
-
-        Shoe.object.filter(id=pk).update(**content)
-        shoe = Shoe.object.get(id=pk)
-        return JsonResponse(shoe, encoder=ShoeEncoder, safe=False)
+        content = json.loads(requests.body)
+        Shoe.objects.filter(id=pk).update(**content)
+        shoe = Shoe.objects.get(id=pk)
+        return JsonResponse(
+            shoe,
+            encoder=ShoeDetailEncoder,
+            safe=False,
+        )

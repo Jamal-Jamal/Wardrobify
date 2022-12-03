@@ -2,17 +2,14 @@ from django.db import models
 from django.urls import reverse
 
 
-class Bin(models.Model):
+class BinVO(models.Model):
     """
     The Bin model describes the name, size and number of the bin.
     """
     closet_name = models.CharField(max_length=100)
     bin_number = models.PositiveSmallIntegerField()
     bin_size = models.PositiveIntegerField()
-    bin_href = models.CharField(max_length=200, unique=True, null=True)
-
-    class Meta:
-        ordering = ("closet_name", "bin_number", "bin_size", "bin_href")
+    import_href = models.CharField(max_length=200, unique=True, null=True)
 
 
 class Shoe(models.Model):
@@ -23,21 +20,16 @@ class Shoe(models.Model):
     manufacturer = models.CharField(max_length=200)
     model_name = models.CharField(max_length=200)
     color = models.CharField(max_length=200)
-    picture_url = models.URLField(null=True)
+    picture_url = models.URLField(null=True, blank=True)
     bin = models.ForeignKey(
-        Bin,
+        BinVO,
+        related_name='bins',
         on_delete=models.CASCADE,
-        related_name='shoes',
-        null=True,
+        null=True
     )
 
     def get_api_url(self):
-        return reverse("", kwargs={"show_bin": self.pk})
+        return reverse("show_shoe", kwargs={"pk": self.pk})
 
     def __str__(self):
         return self.model_name
-
-    class Meta:
-        ordering = ("manufacturer",)  # Default ordering for Shoes
-
-    
