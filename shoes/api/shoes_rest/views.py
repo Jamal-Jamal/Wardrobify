@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from common.json import ModelEncoder
 from .models import BinVO, Shoe
 from django.views.decorators.http import require_http_methods
@@ -10,6 +9,8 @@ class BinVOEncoder(ModelEncoder):
     model = BinVO
     properties = [
         'closet_name',
+        'bin_number',
+        'bin_size',
         'import_href',
     ]
 
@@ -21,7 +22,8 @@ class ShoeEncoder(ModelEncoder):
         'model_name',
         'color',
         'picture_url',
-        'id'
+        'bin',
+        'id',
     ]
 
 
@@ -46,13 +48,12 @@ class ShoeListEncoder(ModelEncoder):
         "model_name",
         "color",
         "picture_url",
+        "bin",
         "id",
     ]
-    def get_extra_data(self, o):
-        return {"bin": o.bin.closet_name}
 
     encoders = {
-        'bin': BinVOEncoder
+        'bin': BinVOEncoder()
     }
 
 
@@ -70,7 +71,7 @@ def api_list_shoes(requests, bin_vo_id=None):
     else:
         content = json.loads(requests.body)
         try:
-            bin_href = content["bin"]
+            bin_href=f'/api/bins/{content["bin"]}/'
             bin = BinVO.objects.get(import_href=bin_href)
             content["bin"] = bin
         except BinVO.DoesNotExist:
