@@ -8,8 +8,6 @@ class LocationVO(models.Model):
     import_href = models.CharField(max_length=200)
 
 
-    def get_api_url(self):
-        return reverse("api_show_location", kwargs={"pk": self.pk})
 
 
 class Hat(models.Model):
