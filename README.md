@@ -157,7 +157,7 @@ hats api-1 = 8090:8000
 
 ## Design
 
-https://gitlab.com/Jamal-Jamal/microservice-two-shot/-/blob/main/Microservice-two-shotDDD.png 
+https://gitlab.com/Jamal-Jamal/microservice-two-shot/-/blob/main/Microservice-two-shotDDD.png
 
 ## Shoes microservice
 

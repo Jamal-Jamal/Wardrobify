@@ -42,7 +42,6 @@ class HatDetailEncoder(ModelEncoder):
         "location": LocationVOEncoder()
     }
 
-
 @require_http_methods(["GET", "POST"])
 def api_list_hats(request, location_vo_id=None):
 

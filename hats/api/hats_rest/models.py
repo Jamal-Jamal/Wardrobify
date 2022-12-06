@@ -7,11 +7,9 @@ class LocationVO(models.Model):
     shelf_number = models.PositiveSmallIntegerField()
     import_href = models.CharField(max_length=200)
 
-    # def __str__(self):
-    #     return f"(self.closet_name) - {self.section_number}/{self.shelf_number}"
 
-    # class Meta:
-    #     ordering = ("closet_name", "section_number", "shelf_number")
+    def get_api_url(self):
+        return reverse("api_show_location", kwargs={"pk": self.pk})
 
 
 class Hat(models.Model):
@@ -26,9 +24,3 @@ class Hat(models.Model):
         null=True,
         on_delete=models.CASCADE,
     )
-
-    # def get_api_url(self):
-    #     return reverse("api_show_hats", kwargs={"id": self.id})
-
-    # def __str__(self):
-    #     return self.style
