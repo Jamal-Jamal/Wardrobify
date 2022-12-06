@@ -28,6 +28,7 @@ class LocationVOEncoder(ModelEncoder):
         "closet_name",
         "section_number",
         "shelf_number",
+        "location",
     ]
 
 @require_http_methods(["GET", "POST"])
