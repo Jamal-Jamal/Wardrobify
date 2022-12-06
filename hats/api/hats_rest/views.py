@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from .models import Hat, LocationVO
 from django.views.decorators.http import require_http_methods
 import json
