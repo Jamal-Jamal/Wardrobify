@@ -125,7 +125,7 @@ class ShoesForm extends React.Component {
                             <input onChange={this.handlePictureUrlChange}
                                 value={this.state.picture_url}
                                 placeholder="Picture Url"
-                                required type="url"
+                                type="url"
                                 name="picture url"
                                 id="picture url"
                                 className="form-control"/>
